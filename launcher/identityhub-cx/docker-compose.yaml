@@ -36,6 +36,7 @@ services:
       - edc.vault.hashicorp.url=http://shared-vault:8200
       - edc.vault.hashicorp.health.check.enabled=true
       - edc.vault.hashicorp.token=vaultsecret0123456789
+      - edc.encryption.aes.key.alias=edc-encryption-aes-key
     volumes:
       - ./additional_config/mc-cred-def.json:/app/setup.json
       - ./additional_config/logging.properties:/app/logging.properties
@@ -134,8 +135,10 @@ services:
       - edc.vault.hashicorp.url=http://shared-vault:8200
       - edc.vault.hashicorp.health.check.enabled=true
       - edc.vault.hashicorp.token=vaultsecret0123456789
+      - edc.encryption.aes.key.alias=edc-encryption-aes-key
     volumes:
       - ./additional_config/logging.properties:/app/logging.properties
+      - ./main/resources/application.properties:/app/configuration.properties
     networks:
       - con-x-test-network
 
@@ -173,8 +176,10 @@ services:
       - edc.vault.hashicorp.url=http://shared-vault:8200
       - edc.vault.hashicorp.health.check.enabled=true
       - edc.vault.hashicorp.token=vaultsecret0123456789
+      - edc.encryption.aes.key.alias=edc-encryption-aes-key
     volumes:
       - ./additional_config/logging.properties:/app/logging.properties
+      - ./main/resources/application.properties:/app/configuration.properties
     networks:
       - con-x-test-network
 

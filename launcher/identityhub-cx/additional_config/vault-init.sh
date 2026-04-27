@@ -46,7 +46,19 @@ create_and_store_keypair() {
   rm -f /tmp/${prefix}_priv_pkcs1.pem /tmp/${prefix}_priv.pem /tmp/${prefix}_pub.pem
 }
 
+# function that creates and stores a base64-encoded AES-256 key:
+create_and_store_aes_key() {
+  local alias=$1
+  local key
+  key=$(openssl rand -base64 32)
+
+  jq -n --arg content "$key" '{data:{content:$content}}' | \
+    curl -fsS -H "X-Vault-Token: $TOKEN" -H "Content-Type: application/json" \
+      -X POST --data-binary @- "$VAULT/v1/secret/data/${alias}"
+}
+
 # create keypair for consumer and provider dataplane:
 
 create_and_store_keypair "cons"
 create_and_store_keypair "prov"
+create_and_store_aes_key "edc-encryption-aes-key"

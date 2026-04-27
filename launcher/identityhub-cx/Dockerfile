@@ -1,7 +1,5 @@
 FROM eclipse-temurin:23_37-jre-alpine
 ARG JAR=build/libs/identity-hub-cx.jar
-ARG OTEL_JAR
-ARG ADDITIONAL_FILES
 
 ARG APP_USER=docker
 ARG APP_UID=10100
@@ -24,13 +22,11 @@ RUN mkdir /app/logs
 USER "$APP_USER"
 
 COPY ${JAR} identity-hub-cx.jar
-COPY ${ADDITIONAL_FILES} ./
-COPY main/resources/application.properties configuration.properties
 
 HEALTHCHECK NONE
 
 ENTRYPOINT ["java", \
      "-Djava.util.logging.config.file=/app/logging.properties", \
-     "-Djava.security.egd=file:/dev/urandom", \
+     "-Dedc.fs.config=/app/configuration.properties", \
      "-jar", \
      "identity-hub-cx.jar"]
