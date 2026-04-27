@@ -107,6 +107,9 @@ include(":extensions:api:identity-api:validators:keypair-validators")
 include(":extensions:api:identity-api:validators:participant-context-validators")
 include(":extensions:api:identity-api:validators:verifiable-credential-validators")
 
+// Construct-x super-user module
+include(":extensions:construct-x:super-user")
+
 // issuance modules
 include(":extensions:issuance:issuerservice-database-attestations")
 include(":extensions:issuance:issuerservice-holder-attestations")
@@ -115,6 +118,7 @@ include(":extensions:issuance:local-statuslist-publisher")
 
 // other modules
 include(":launcher:identityhub")
+include(":launcher:identityhub-cx")
 include(":launcher:identityhub-oauth2")
 include(":launcher:issuer-service")
 include(":launcher:issuer-service-oauth2")
