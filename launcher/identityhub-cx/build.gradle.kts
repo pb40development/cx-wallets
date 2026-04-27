@@ -24,6 +24,7 @@ dependencies {
     runtimeOnly("org.eclipse.edc:identityhub-bom:$edcVersion")
     runtimeOnly("org.eclipse.edc:identityhub-feature-sql-bom:$edcVersion")
     runtimeOnly(libs.edc.vault.hashicorp)
+    implementation(libs.edc.lib.common.crypto)
     implementation(project(":extensions:construct-x:super-user"))
 }
 
