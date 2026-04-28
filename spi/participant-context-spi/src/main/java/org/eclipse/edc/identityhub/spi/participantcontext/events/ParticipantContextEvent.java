@@ -16,17 +16,30 @@ package org.eclipse.edc.identityhub.spi.participantcontext.events;
 
 import org.eclipse.edc.identityhub.spi.participantcontext.model.IdentityHubParticipantContext;
 import org.eclipse.edc.spi.event.Event;
+import org.eclipse.edc.spi.telemetry.TraceCarrier;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * Base class for all events related to state changes and actions of {@link IdentityHubParticipantContext}s
  */
-public abstract class ParticipantContextEvent extends Event {
+public abstract class ParticipantContextEvent extends Event implements TraceCarrier {
     protected String participantContextId;
+    protected Map<String, String> traceContext;
 
     public String getParticipantContextId() {
         return participantContextId;
+    }
+
+    @Override
+    public Map<String, String> getTraceContext() {
+        return traceContext;
+    }
+
+    public ParticipantContextEvent withTraceContext(Map<String, String> traceContext) {
+        this.traceContext = traceContext;
+        return this;
     }
 
     public abstract static class Builder<T extends ParticipantContextEvent, B extends ParticipantContextEvent.Builder<T, B>> {
@@ -41,6 +54,11 @@ public abstract class ParticipantContextEvent extends Event {
 
         public B participantContextId(String participantContextId) {
             event.participantContextId = participantContextId;
+            return self();
+        }
+
+        public B traceContext(Map<String, String> traceContext) {
+            event.traceContext = traceContext;
             return self();
         }
 

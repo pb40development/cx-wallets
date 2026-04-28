@@ -39,14 +39,15 @@ import org.eclipse.edc.spi.EdcException;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.system.ServiceExtension;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
+import org.eclipse.edc.spi.telemetry.Telemetry;
 import org.eclipse.edc.spi.types.TypeManager;
 import org.eclipse.edc.token.rules.ExpirationIssuedAtValidationRule;
+import org.eclipse.edc.token.rules.JtiValidationRule;
 import org.eclipse.edc.token.rules.NotBeforeValidationRule;
 import org.eclipse.edc.token.spi.TokenValidationRulesRegistry;
 import org.eclipse.edc.token.spi.TokenValidationService;
 import org.eclipse.edc.transaction.spi.TransactionContext;
 import org.eclipse.edc.verifiablecredentials.jwt.rules.IssuerEqualsSubjectRule;
-import org.eclipse.edc.verifiablecredentials.jwt.rules.JtiValidationRule;
 
 import java.time.Clock;
 
@@ -117,6 +118,8 @@ public class DcpIssuerCoreExtension implements ServiceExtension {
     private JtiValidationStore jtiValidationStore;
     @Setting(description = "Allow anonymous onboarding", defaultValue = "false", key = "edc.issuance.anonymous.allowed")
     private boolean allowAnonymousCredentialRequest;
+    @Inject
+    private Telemetry telemetry;
 
     @Override
     public void initialize(ServiceExtensionContext context) {
@@ -135,7 +138,7 @@ public class DcpIssuerCoreExtension implements ServiceExtension {
 
     @Provider
     public DcpIssuerService createIssuerService() {
-        return new DcpIssuerServiceImpl(transactionContext, credentialDefinitionService, issuanceProcessStore, attestationPipeline, credentialRuleDefinitionEvaluator, profileRegistry);
+        return new DcpIssuerServiceImpl(transactionContext, credentialDefinitionService, issuanceProcessStore, attestationPipeline, credentialRuleDefinitionEvaluator, profileRegistry, telemetry);
     }
 
     @Provider

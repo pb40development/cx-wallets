@@ -33,7 +33,7 @@ import org.eclipse.edc.spi.result.ServiceResult;
 import org.eclipse.edc.spi.result.StoreResult;
 import org.eclipse.edc.token.TokenValidationRulesRegistryImpl;
 import org.eclipse.edc.token.TokenValidationServiceImpl;
-import org.eclipse.edc.verifiablecredentials.jwt.rules.JtiValidationRule;
+import org.eclipse.edc.token.rules.JtiValidationRule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -107,7 +107,7 @@ class SelfIssuedTokenVerifierImplComponentTest {
 
         var selfIssuedIdToken = createSignedJwt(spoofedKey, new JWTClaimsSet.Builder().claim("foo", "bar").jwtID(UUID.randomUUID().toString()).build());
         assertThat(verifier.verify(selfIssuedIdToken, PARTICIPANT_CONTEXT_ID)).isFailed()
-                .detail().isEqualTo("Token verification failed");
+                .detail().isEqualTo("JWT signature not valid");
 
     }
 
@@ -246,7 +246,7 @@ class SelfIssuedTokenVerifierImplComponentTest {
                 .build());
 
         assertThat(verifier.verify(siToken, PARTICIPANT_CONTEXT_ID)).isFailed()
-                .detail().isEqualTo("Token verification failed");
+                .detail().isEqualTo("JWT signature not valid");
     }
 
     @Test

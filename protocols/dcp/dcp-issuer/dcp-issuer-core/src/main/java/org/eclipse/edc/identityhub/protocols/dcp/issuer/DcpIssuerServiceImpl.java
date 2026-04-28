@@ -14,6 +14,7 @@
 
 package org.eclipse.edc.identityhub.protocols.dcp.issuer;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.eclipse.edc.iam.verifiablecredentials.spi.model.CredentialFormat;
 import org.eclipse.edc.identityhub.protocols.dcp.issuer.spi.DcpIssuerService;
 import org.eclipse.edc.identityhub.protocols.dcp.spi.DcpProfileRegistry;
@@ -30,6 +31,7 @@ import org.eclipse.edc.issuerservice.spi.issuance.rule.CredentialRuleDefinitionE
 import org.eclipse.edc.spi.query.Criterion;
 import org.eclipse.edc.spi.query.QuerySpec;
 import org.eclipse.edc.spi.result.ServiceResult;
+import org.eclipse.edc.spi.telemetry.Telemetry;
 import org.eclipse.edc.transaction.spi.TransactionContext;
 
 import java.util.Collection;
@@ -45,21 +47,24 @@ public class DcpIssuerServiceImpl implements DcpIssuerService {
     private final AttestationPipeline attestationPipeline;
     private final CredentialRuleDefinitionEvaluator credentialRuleDefinitionEvaluator;
     private final DcpProfileRegistry profileRegistry;
+    private final Telemetry telemetry;
 
     public DcpIssuerServiceImpl(TransactionContext transactionContext,
                                 CredentialDefinitionService credentialDefinitionService,
                                 IssuanceProcessStore issuanceProcessStore,
                                 AttestationPipeline attestationPipeline,
                                 CredentialRuleDefinitionEvaluator credentialRuleDefinitionEvaluator,
-                                DcpProfileRegistry profileRegistry) {
+                                DcpProfileRegistry profileRegistry, Telemetry telemetry) {
         this.transactionContext = transactionContext;
         this.credentialDefinitionService = credentialDefinitionService;
         this.issuanceProcessStore = issuanceProcessStore;
         this.attestationPipeline = attestationPipeline;
         this.credentialRuleDefinitionEvaluator = credentialRuleDefinitionEvaluator;
         this.profileRegistry = profileRegistry;
+        this.telemetry = telemetry;
     }
 
+    @WithSpan(value = "issuance.initiate")
     @Override
     public ServiceResult<CredentialRequestMessage.Response> initiateCredentialsIssuance(String participantContextId, CredentialRequestMessage message, DcpRequestContext context) {
         if (message.getCredentials().isEmpty()) {
@@ -143,6 +148,7 @@ public class DcpIssuerServiceImpl implements DcpIssuerService {
 
     private ServiceResult<IssuanceProcess> createIssuanceProcess(String participantContextId, String holderPid, Map<String, CredentialFormat> credentialFormats, DcpRequestContext context, AttestationEvaluationResponse evaluationResponse) {
 
+
         var credentialDefinitionIds = evaluationResponse.credentialDefinitions().stream()
                 .map(CredentialDefinition::getId)
                 .collect(Collectors.toSet());
@@ -153,6 +159,7 @@ public class DcpIssuerServiceImpl implements DcpIssuerService {
                 .claims(evaluationResponse.claims())
                 .participantContextId(participantContextId)
                 .holderPid(holderPid)
+                .traceContext(telemetry.getCurrentTraceContext())
                 .credentialFormats(credentialFormats)
                 .build();
 

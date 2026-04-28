@@ -14,6 +14,8 @@
 
 package org.eclipse.edc.identityhub.did;
 
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.eclipse.edc.iam.did.spi.document.DidDocument;
 import org.eclipse.edc.iam.did.spi.document.Service;
 import org.eclipse.edc.iam.did.spi.document.VerificationMethod;
@@ -38,11 +40,14 @@ import org.eclipse.edc.spi.query.QuerySpec;
 import org.eclipse.edc.spi.result.AbstractResult;
 import org.eclipse.edc.spi.result.ServiceResult;
 import org.eclipse.edc.spi.result.StoreResult;
+import org.eclipse.edc.spi.telemetry.Telemetry;
+import org.eclipse.edc.spi.telemetry.TraceCarrier;
 import org.eclipse.edc.transaction.spi.TransactionContext;
 
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.Collection;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.eclipse.edc.participantcontext.spi.types.ParticipantResource.queryByParticipantContextId;
@@ -60,18 +65,21 @@ public class DidDocumentServiceImpl implements DidDocumentService, EventSubscrib
     private final ParticipantContextStore participantContextStore;
     private final Monitor monitor;
     private final KeyParserRegistry keyParserRegistry;
+    private final Telemetry telemetry;
 
     public DidDocumentServiceImpl(TransactionContext transactionContext, DidResourceStore didResourceStore, DidDocumentPublisherRegistry registry,
-                                  ParticipantContextStore participantContextStore, Monitor monitor, KeyParserRegistry keyParserRegistry) {
+                                  ParticipantContextStore participantContextStore, Monitor monitor, KeyParserRegistry keyParserRegistry, Telemetry telemetry) {
         this.transactionContext = transactionContext;
         this.didResourceStore = didResourceStore;
         this.registry = registry;
         this.participantContextStore = participantContextStore;
         this.monitor = monitor;
         this.keyParserRegistry = keyParserRegistry;
+        this.telemetry = telemetry;
     }
 
     @Override
+    @WithSpan(value = "did-document.store", kind = SpanKind.INTERNAL)
     public ServiceResult<Void> store(DidDocument document, String participantContextId) {
         return transactionContext.execute(() -> {
             var res = DidResource.Builder.newInstance()
@@ -244,17 +252,30 @@ public class DidDocumentServiceImpl implements DidDocumentService, EventSubscrib
     @Override
     public <E extends Event> void on(EventEnvelope<E> eventEnvelope) {
         var payload = eventEnvelope.getPayload();
-        if (payload instanceof ParticipantContextUpdated event) {
-            updated(event);
-        } else if (payload instanceof KeyPairRevoked event) {
-            keypairRevoked(event);
-        } else if (payload instanceof KeyPairActivated event) {
-            keyPairActivated(event);
+
+
+        var s = (Supplier<Void>) () -> {
+            if (payload instanceof ParticipantContextUpdated event) {
+                updated(event);
+            } else if (payload instanceof KeyPairRevoked event) {
+                keypairRevoked(event);
+            } else if (payload instanceof KeyPairActivated event) {
+                keyPairActivated(event);
+            } else {
+                monitor.warning("Received event with unexpected payload type: %s".formatted(payload.getClass()));
+            }
+            return null;
+        };
+
+        if (payload instanceof TraceCarrier carrier) {
+            telemetry.contextPropagationMiddleware(s, carrier).get();
         } else {
-            monitor.warning("Received event with unexpected payload type: %s".formatted(payload.getClass()));
+            s.get();
         }
+
     }
 
+    @WithSpan(value = "did-document.keypair-activated", kind = SpanKind.INTERNAL)
     private void keyPairActivated(KeyPairActivated event) {
         transactionContext.execute(() -> {
             var didResources = findByParticipantContextId(event.getParticipantContextId());
@@ -294,6 +315,7 @@ public class DidDocumentServiceImpl implements DidDocumentService, EventSubscrib
         });
     }
 
+    @WithSpan(value = "did-document.keypair-revoked", kind = SpanKind.INTERNAL)
     private void keypairRevoked(KeyPairRevoked event) {
         var didResources = findByParticipantContextId(event.getParticipantContextId());
         var keyId = event.getKeyId();
@@ -310,6 +332,7 @@ public class DidDocumentServiceImpl implements DidDocumentService, EventSubscrib
         }
     }
 
+    @WithSpan(value = "did-document.updated", kind = SpanKind.INTERNAL)
     private void updated(ParticipantContextUpdated event) {
         var newState = event.getNewState();
         var forParticipant = findByParticipantContextId(event.getParticipantContextId());

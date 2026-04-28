@@ -28,6 +28,7 @@ import org.eclipse.edc.spi.event.EventSubscriber;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.result.ServiceResult;
 import org.eclipse.edc.spi.security.Vault;
+import org.eclipse.edc.spi.telemetry.Telemetry;
 
 /**
  * AccountProvisioner, that synchronizes the {@link IdentityHubParticipantContext} object
@@ -41,15 +42,17 @@ public class StsAccountProvisionerImpl implements EventSubscriber, StsAccountPro
     private final Vault vault;
     private final StsClientSecretGenerator stsClientSecretGenerator;
     private final StsAccountService stsAccountService;
+    private final Telemetry telemetry;
 
     public StsAccountProvisionerImpl(Monitor monitor,
                                      Vault vault,
                                      StsClientSecretGenerator stsClientSecretGenerator,
-                                     StsAccountService stsAccountService) {
+                                     StsAccountService stsAccountService, Telemetry telemetry) {
         this.monitor = monitor;
         this.vault = vault;
         this.stsClientSecretGenerator = stsClientSecretGenerator;
         this.stsAccountService = stsAccountService;
+        this.telemetry = telemetry;
     }
 
     @Override
@@ -57,7 +60,9 @@ public class StsAccountProvisionerImpl implements EventSubscriber, StsAccountPro
         var payload = event.getPayload();
         ServiceResult<Void> result;
         if (payload instanceof ParticipantContextDeleted deletedEvent) {
-            result = stsAccountService.deleteAccount(deletedEvent.getParticipantContextId());
+            result = telemetry.contextPropagationMiddleware(() -> {
+                return stsAccountService.deleteAccount(deletedEvent.getParticipantContextId());
+            }, deletedEvent).get();
         } else {
             result = ServiceResult.badRequest("Received event with unexpected payload type: %s".formatted(payload.getClass()));
         }
