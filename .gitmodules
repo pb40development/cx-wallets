@@ -1,0 +1,3 @@
+[submodule "extensions/super-user-seed-extension"]
+	path = extensions/super-user-seed-extension
+	url = https://github.com/FraunhoferISST/super-user-seed-extension.git
