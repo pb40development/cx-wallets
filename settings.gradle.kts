@@ -62,6 +62,8 @@ include(":extensions:sts:sts-account-provisioner")
 include(":extensions:sts:sts-account-service-local")
 include(":extensions:sts:sts-core")
 include(":extensions:sts:sts-api")
+include(":extensions:super-user-seed-extension")
+include(":extensions:con-x:dev-attestation")
 
 // DCP protocol modules
 include(":protocols:dcp:dcp-spi")
@@ -118,6 +120,8 @@ include(":launcher:identityhub")
 include(":launcher:identityhub-oauth2")
 include(":launcher:issuer-service")
 include(":launcher:issuer-service-oauth2")
+
+include(":launcher:con-x-wallet")
 
 // test modules
 include(":e2e-tests")
