@@ -26,14 +26,12 @@ plugins {
 val edcVersion = project.property("con-x-edcVersion") as String
 
 dependencies {
-    runtimeOnly("org.eclipse.edc:connector-core:${edcVersion}")
     runtimeOnly("org.eclipse.edc:console-monitor:${edcVersion}")
     runtimeOnly("org.eclipse.edc:identityhub-bom:${edcVersion}")
     runtimeOnly("org.eclipse.edc:issuerservice-bom:${edcVersion}")
     runtimeOnly("org.eclipse.edc:identityhub-feature-sql-bom:${edcVersion}")
     runtimeOnly("org.eclipse.edc:issuerservice-feature-sql-bom:${edcVersion}")
     runtimeOnly("org.eclipse.edc:vault-hashicorp:${edcVersion}")
-    runtimeOnly("org.eclipse.edc:participantcontext-config-store-sql:${edcVersion}")
 
     runtimeOnly(project(":extensions:super-user-seed-extension"))
     runtimeOnly(project(":extensions:con-x:dev-attestation"))
@@ -55,7 +53,7 @@ tasks.shadowJar {
 }
 
 
-val imageName = "org.construct-x/wallet:${releaseVersion}"
+val imageName = "wallet:${releaseVersion}"
 val shadowJar = tasks.named<ShadowJar>("shadowJar")
 val jarFileName = "$releaseVersion.jar"
 
