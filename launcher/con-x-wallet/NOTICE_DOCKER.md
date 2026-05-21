@@ -35,7 +35,7 @@ This product includes third-party components:
   Licensed under the GNU General Public License, version 2 with the Classpath Exception
   See: https://adoptium.net
 
-Additional third-party dependencies and their licenses are listed in the build configuration and dependency metadata.
+Additional third-party dependencies and their licenses are listed in the build configuration and in the dependency metadata, as shown in the `DEPENDENCIES` file.
 
 **Used base image**
 
