@@ -21,7 +21,7 @@ ARG IMAGE_CREATED
 ARG VERSION_TAG
 
 LABEL org.opencontainers.image.title="Construct-X Wallet" \
-      org.opencontainers.image.description="Wallet-Service for Project Construct-X. It includes functionalities of both an identity-hub and an issuer-service" \
+      org.opencontainers.image.description="Wallet-Service for Project Construct-X. It includes functionalities of both an identity-hub and an issuer-service." \
       org.opencontainers.image.url="https://github.com/project-construct-x/wallet" \
       org.opencontainers.image.source="https://github.com/project-construct-x/wallet" \
       org.opencontainers.image.version="${VERSION_TAG}" \
