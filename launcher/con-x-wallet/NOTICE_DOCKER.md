@@ -1,7 +1,7 @@
 # Notices for Construct-X Wallet
 
 
-This product includes software developed by the construct-x-project and its contributors.
+This product includes software developed by the Project Construct-X and its contributors.
 The software is licensed under the Apache License, Version 2.0.
 You may obtain a copy of the License at:
 
