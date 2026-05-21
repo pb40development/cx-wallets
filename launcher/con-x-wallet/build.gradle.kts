@@ -84,7 +84,7 @@ val shadowJar = tasks.named<ShadowJar>("shadowJar")
 val jarFileName = "$releaseVersion.jar"
 
 tasks.register<Exec>("dockerize") {
-    dependsOn(shadowJar)
+    dependsOn(shadowJar, generateRuntimeClasspathDeps)
 
     workingDir = project.projectDir
 
