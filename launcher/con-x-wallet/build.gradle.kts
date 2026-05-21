@@ -16,6 +16,7 @@
 
 import org.gradle.api.tasks.Exec
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import java.time.Instant
 
 plugins {
     `java-library`
@@ -52,13 +53,38 @@ tasks.shadowJar {
     manifest { attributes["Main-Class"] = application.mainClass.get() }
 }
 
+val depsReportFile = layout.buildDirectory.file("docker/runtimeClasspath-dependencies.txt")
+
+val generateRuntimeClasspathDeps = tasks.register("generateRuntimeClasspathDeps") {
+    outputs.file(depsReportFile)
+
+    doLast {
+        val conf = configurations.runtimeClasspath.get()
+
+        val outFile = depsReportFile.get().asFile
+        outFile.parentFile.mkdirs()
+
+        outFile.printWriter().use { out ->
+            out.println("runtimeClasspath dependencies:")
+            conf.incoming.resolutionResult.allComponents.forEach { component ->
+                val id = component.moduleVersion
+                if (id != null) {
+                    out.println("${id.group}:${id.name}:${id.version}")
+                } else {
+                    out.println(component.id.toString())
+                }
+            }
+        }
+    }
+}
+
 
 val imageName = "wallet:${releaseVersion}"
 val shadowJar = tasks.named<ShadowJar>("shadowJar")
 val jarFileName = "$releaseVersion.jar"
 
 tasks.register<Exec>("dockerize") {
-    dependsOn(shadowJar)
+    dependsOn(shadowJar, generateRuntimeClasspathDeps)
 
     workingDir = project.projectDir
 
@@ -70,9 +96,25 @@ tasks.register<Exec>("dockerize") {
         require(jarFile.exists()) { "Shadow-Jar build/libs/$jarFileName missing " +
                 "– please make sure \"shadowJar\" gradle task is successful" }
 
+        val depsFile = depsReportFile.get().asFile
+        require(depsFile.exists()) {
+            "Dependencies report ${depsFile.absolutePath} missing – check generateRuntimeClasspathDeps task"
+        }
+
+        val dockerDir = project.layout.buildDirectory.dir("docker").get().asFile
+        project.copy {
+            from(rootProject.files("LICENSE"))
+            into(dockerDir)
+        }
+
+
+        val imageCreated = Instant.now().toString()
+
         commandLine(
             "docker", "build",
             "--build-arg", "JAR_FILE=$jarFileName",
+            "--build-arg", "IMAGE_CREATED=$imageCreated",
+            "--build-arg", "VERSION_TAG=$releaseVersion",
             "-t", imageName,
             "."
         )

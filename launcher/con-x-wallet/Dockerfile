@@ -17,7 +17,22 @@
 FROM eclipse-temurin:25-jre
 WORKDIR /app
 
+ARG IMAGE_CREATED
+ARG VERSION_TAG
+
+LABEL org.opencontainers.image.title="Construct-X Wallet" \
+      org.opencontainers.image.description="Wallet-Service for Project Construct-X. It includes functionalities of both an identity-hub and an issuer-service." \
+      org.opencontainers.image.url="https://github.com/project-construct-x/wallet" \
+      org.opencontainers.image.source="https://github.com/project-construct-x/wallet" \
+      org.opencontainers.image.version="${VERSION_TAG}" \
+      org.opencontainers.image.licenses="Apache-2.0" \
+      org.opencontainers.image.created="${IMAGE_CREATED}"
+
 ARG JAR_FILE
 COPY build/libs/${JAR_FILE} /app/app.jar
+
+COPY build/docker/runtimeClasspath-dependencies.txt /app/DEPENDENCIES
+COPY build/docker/LICENSE /app/LICENSE
+COPY NOTICE_DOCKER.md /app/NOTICE.md
 
 ENTRYPOINT ["sh","-c","exec java -jar /app/app.jar --log-level=debug"]
