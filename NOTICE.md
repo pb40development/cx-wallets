@@ -32,6 +32,8 @@ The project maintains the following source code repository:
 
 Please refer to the [DEPENDENCIES](https://eclipse-edc.github.io/IdentityHub/DEPENDENCIES) file for a detailed report.
 
+Beyond that, the construct-x wallet repository also includes the super-user-seed-extension as provided [here](https://github.com/FraunhoferISST/super-user-seed-extension) as a submodule. 
+
 ## Cryptography
 
 Content may contain encryption software. The country in which you are currently may have restrictions on the import,
