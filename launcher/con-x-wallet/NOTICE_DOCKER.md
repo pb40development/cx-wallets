@@ -32,7 +32,7 @@ This product includes third-party components:
 
 - Eclipse Temurin (base container image)
   Provided by the Eclipse Adoptium project
-  Licensed under the Eclipse Public License 2.0 and GNU General Public License, version 2 with the OpenJDK Assembly Exception
+  Licensed under the GNU General Public License, version 2 with the Classpath Exception
   See: https://adoptium.net
 
 Additional third-party dependencies and their licenses are listed in the build configuration and dependency metadata.
