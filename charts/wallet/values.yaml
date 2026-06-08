@@ -195,11 +195,9 @@ wallet:
         external-dns.alpha.kubernetes.io/ttl: "300"
       # -- EDC endpoints exposed by this ingress resource
       endpoints:
-        - default
         - credentials
         - did
         - sts
-        - identity
       # -- Defines the [ingress class](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class) to use
       className: "nginx"
       # -- TLS [tls class](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls) applied to the ingress resource
@@ -223,8 +221,6 @@ wallet:
       # -- EDC endpoints exposed by this ingress resource
       endpoints:
         - identity
-        - accounts
-        - version
       # -- Defines the [ingress class](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class) to use
       className: "nginx"
       # -- TLS [tls class](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls) applied to the ingress resource
