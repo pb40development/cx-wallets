@@ -24,7 +24,8 @@
 {{ $fullName := .Values.fullnameOverride -}}
 {{- $iam := index .Values "wallet" "iam" | default dict }}
 {{- $issuer := index .Values "wallet" "issuer" | default dict }}
-{{- $defaultStlCallback := := printf "https://%s:%v%s" .Values.wallet.ingresses[0].hostname .Values.wallet.endpoints.statuslist.port .Values.wallet.endpoints.statuslist.path }}
+{{- $statuslist := index $issuer "statuslist" | default dict }}
+{{- $defaultStlCallback := printf "https://%s:%v%s" (index .Values.wallet.ingresses 0).hostname .Values.wallet.endpoints.statuslist.port .Values.wallet.endpoints.statuslist.path }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -60,7 +61,7 @@ data:
   EDC_IAM_KEY_ALGORITHM: {{ $iam.keyAlgorithm | default "RSA" | quote }}
   EDC_IAM_CREDENTIAL_RENEWAL_GRACEPERIOD: {{ $iam.renewalGraceperiod | default "172800" | quote }}
   EDC_ISSUER_ISSUANCE_SEND_RETRY_LIMIT: {{ $issuer.sendRetryLimit | default "0" | quote }}
-  EDC_STATUSLIST_CALLBACK_ADDRESS: {{ $issuer.statuslist.callbackAddress | default $defaultStlCallback | quote }} 
+  EDC_STATUSLIST_CALLBACK_ADDRESS: {{ $statuslist.callbackAddress | default $defaultStlCallback | quote }} 
 
   ###########
   ## VAULT ##
@@ -76,4 +77,4 @@ data:
   ## Encryption  ##
   #################
   EDC_ENCRYPTION_AES_KEY_ALIAS: {{ .Values.vault.hashicorp.init.aesKeyAlias | default "issuer-wallet-aes-key-alias" | quote }}
-  EDC_ISSUER_STATUSLIST_SIGNING_KEY_ALIAS: {{ $issuer.statuslist.signingKeyAlias | default "foo" | quote }}
+  EDC_ISSUER_STATUSLIST_SIGNING_KEY_ALIAS: {{ $statuslist.signingKeyAlias | default "foo" | quote }}
