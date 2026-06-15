@@ -142,7 +142,7 @@ A list of Ingress definitions. Each entry creates one Ingress resource routing t
 
 ### `postgresql`
 
-The chart uses the Bitnami legacy PostgreSQL sub-chart.
+The chart uses the Cloudpirates PostgreSQL Chart.
 
 | Key | Type | Default | Description |
 |---|---|---|---|
@@ -150,8 +150,10 @@ The chart uses the Bitnami legacy PostgreSQL sub-chart.
 | `postgresql.auth.database` | string | `issuer` | Database name created on first start. |
 | `postgresql.auth.username` | string | `user` | Database user the issuer-wallet connects as. |
 | `postgresql.auth.password` | string | `password` | Database password. **Change before production use.** |
-| `postgresql.primary.persistence.enabled` | bool | `true` | Persist primary node data. Disable only for throwaway test environments. |
-| `postgresql.readReplicas.persistence.enabled` | bool | `false` | Persist read-replica data. |
+| `postgresql.persistence.enabled` | bool | `true` | Persist primary node data. Disable only for throwaway test environments. |
+| `postgresql.persistence.size` | string | `10Gi` | Size of allocated Persistent Volume. |
+| `postgresql.persistence.storageClass` | string | `""` | Storage Class of used Storage Provisioner. |
+| `postgresql.initdb.scriptsConfigMap` | string | `""` | Name of ConfigMap for Database Initialization. |
 
 ### `vault`
 
