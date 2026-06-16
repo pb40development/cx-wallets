@@ -25,7 +25,7 @@
 {{- $iam := index .Values "wallet" "iam" | default dict }}
 {{- $issuer := index .Values "wallet" "issuer" | default dict }}
 {{- $statuslist := index $issuer "statuslist" | default dict }}
-{{- $defaultStlCallback := printf "https://%s:%v%s" (index .Values.wallet.ingresses 0).hostname .Values.wallet.endpoints.statuslist.port .Values.wallet.endpoints.statuslist.path }}
+{{- $defaultStlCallback := printf "https://%s%s" (index .Values.wallet.ingresses 0).hostname .Values.wallet.endpoints.statuslist.path }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
