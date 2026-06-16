@@ -64,6 +64,7 @@ include(":extensions:sts:sts-core")
 include(":extensions:sts:sts-api")
 include(":extensions:super-user-seed-extension")
 include(":extensions:con-x:dev-attestation")
+include(":extensions:con-x:sql-vault")
 
 // DCP protocol modules
 include(":protocols:dcp:dcp-spi")

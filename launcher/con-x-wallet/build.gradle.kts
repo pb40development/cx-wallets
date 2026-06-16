@@ -32,10 +32,10 @@ dependencies {
     runtimeOnly("org.eclipse.edc:issuerservice-bom:${edcVersion}")
     runtimeOnly("org.eclipse.edc:identityhub-feature-sql-bom:${edcVersion}")
     runtimeOnly("org.eclipse.edc:issuerservice-feature-sql-bom:${edcVersion}")
-    runtimeOnly("org.eclipse.edc:vault-hashicorp:${edcVersion}")
 
     runtimeOnly(project(":extensions:super-user-seed-extension"))
     runtimeOnly(project(":extensions:con-x:dev-attestation"))
+    runtimeOnly(project(":extensions:con-x:sql-vault"))
 }
 
 repositories { mavenCentral() }
