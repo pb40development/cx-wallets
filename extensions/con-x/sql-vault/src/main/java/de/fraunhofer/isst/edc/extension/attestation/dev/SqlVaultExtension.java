@@ -17,10 +17,12 @@
 package de.fraunhofer.isst.edc.extension.attestation.dev;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
 import org.eclipse.edc.runtime.metamodel.annotation.Provider;
 import org.eclipse.edc.runtime.metamodel.annotation.Setting;
+import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.system.ServiceExtension;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
@@ -47,6 +49,11 @@ public class SqlVaultExtension implements ServiceExtension {
     @Inject
     private SqlSchemaBootstrapper sqlSchemaBootstrapper;
 
+    private SqlVault sqlVault;
+    private Monitor monitor;
+
+    @Setting(description = "initial k-v pairs to be used", key = "edc.sql.store.vault.initdata")
+    private String initData;
 
     @Override
     public String name() {
@@ -55,12 +62,30 @@ public class SqlVaultExtension implements ServiceExtension {
 
     @Override
     public void initialize(ServiceExtensionContext context) {
+        this.monitor = context.getMonitor().withPrefix(this.getClass().getSimpleName());
         sqlSchemaBootstrapper.addStatementFromResource(dataSourceName, "sql-vault.sql");
     }
 
     @Provider
     public Vault provideSQLVault(ServiceExtensionContext context) {
-        return new SqlVault(dataSourceRegistry, dataSourceName, transactionContext, typemanager.getMapper(),
+        sqlVault = new SqlVault(dataSourceRegistry, dataSourceName, transactionContext, typemanager.getMapper(),
                 queryExecutor, context.getMonitor());
+        return sqlVault;
+    }
+
+    @Override
+    public void start(){
+        if (initData != null && !initData.isEmpty()) {
+            String[] kvPairs = initData.split(";");
+            for (String kvPair : kvPairs) {
+                try {
+                    String[] kv = kvPair.split("::");
+                    sqlVault.storeSecret(kv[0], kv[1]);
+                } catch (Exception e) {
+                    monitor.warning("Error storing sql vault data: " + kvPair);
+                }
+            }
+        }
+
     }
 }
