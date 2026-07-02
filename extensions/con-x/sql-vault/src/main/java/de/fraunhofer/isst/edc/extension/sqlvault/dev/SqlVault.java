@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package de.fraunhofer.isst.edc.extension.attestation.dev;
+package de.fraunhofer.isst.edc.extension.sqlvault.dev;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.edc.spi.monitor.Monitor;
