@@ -2,7 +2,7 @@
 
 ![module-overview](./identity.hub.modules.png)
 
-## VC Module (`:core:lib:verifiable-presentations-lib`)
+## VC Module (`:core:identity-hub-core`)
 
 Contains the `VerifiablePresentationService` implementation.<br/>
 Its job is to
@@ -14,7 +14,7 @@ Its job is to
 - exchanges protocol messages with the Issuer, e.g. in response to a credential-offer
 
 `VerifiableCredentialManager`: it can be configured whether credentials are auto-renewed (default is `true`). Once a
-renewal is triggered , it moves into the `REISSUE_REQUESTING` state. Generally, renewals can be triggered by three
+renewal is triggered, the credential moves into the `REQUESTING` state. Generally, renewals can be triggered by three
 events:
 
 1. an incoming credential offer
@@ -75,9 +75,9 @@ all SPIs that are relevant here.
 ## Hub API (`:core:presentation-api`)
 
 This module contains implementations for
-the [Presentation API](https://github.com/eclipse-tractusx/identity-trust/blob/main/specifications/M1/verifiable.presentation.protocol.md#4-resolution-api)
+the [Presentation API](https://eclipse-dataspace-dcp.github.io/decentralized-claims-protocol/v1.0.1/#resolution-api)
 and
-the [Storage API](https://github.com/eclipse-tractusx/identity-trust/blob/main/specifications/M1/verifiable.presentation.protocol.md#5-storage-api).
+the [Storage API](https://eclipse-dataspace-dcp.github.io/decentralized-claims-protocol/v1.0.1/#storage-api).
 Is
 contains model classes, validators and JSON-LD-transformers.
 

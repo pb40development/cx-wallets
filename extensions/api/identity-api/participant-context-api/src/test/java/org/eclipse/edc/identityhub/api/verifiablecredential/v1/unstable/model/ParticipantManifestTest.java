@@ -56,7 +56,7 @@ class ParticipantManifestTest {
     void verify_deserialize_singleValueAsArray() throws JsonProcessingException {
         var json = """
                 {
-                    "roles":[],
+                    "scopes":[],
                     "serviceEndpoints":[
                         {
                             "type": "CredentialService",
@@ -85,13 +85,14 @@ class ParticipantManifestTest {
         assertThat(manifest.getKeys()).hasSize(1)
                 .allSatisfy(kd -> assertThat(kd.getKeyId()).isEqualTo("key-1"));
         assertThat(manifest.getApiKeyAlias()).isEqualTo("test-alias");
+        assertThat(manifest.isProvisionStsAccount()).isTrue();
     }
 
     @Test
     void verify_deserialize_array() throws JsonProcessingException {
         var json = """
                 {
-                    "roles":[],
+                    "scopes":[],
                     "serviceEndpoints":[
                         {
                             "type": "CredentialService",

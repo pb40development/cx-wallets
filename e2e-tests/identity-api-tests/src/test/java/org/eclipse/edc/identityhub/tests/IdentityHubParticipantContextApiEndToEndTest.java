@@ -75,6 +75,7 @@ import static org.eclipse.edc.identityhub.tests.fixtures.common.AbstractIdentity
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -111,7 +112,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
 
             var su = identityHub.getIdentityEndpoint().baseRequest()
                     .header(apikey)
-                    .get("/v1alpha/participants/" + SUPER_USER)
+                    .get("/v1beta/participants/" + SUPER_USER)
                     .then()
                     .statusCode(200)
                     .extract().body().as(IdentityHubParticipantContext.class);
@@ -141,7 +142,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
             identityHub.getIdentityEndpoint().baseRequest()
                     .header(userAuth)
                     .contentType(ContentType.JSON)
-                    .get("/v1alpha/participants/" + user2)
+                    .get("/v1beta/participants/" + user2)
                     .then()
                     .log().ifValidationFails()
                     .statusCode(403);
@@ -158,7 +159,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
                     .header(authorizeUser(SUPER_USER, identityHub))
                     .contentType(ContentType.JSON)
                     .body(manifest)
-                    .post("/v1alpha/participants/")
+                    .post("/v1beta/participants/")
                     .then()
                     .log().ifError()
                     .statusCode(anyOf(equalTo(200), equalTo(204)))
@@ -172,6 +173,34 @@ public class IdentityHubParticipantContextApiEndToEndTest {
             assertThat(identityHub.getDidForParticipant(manifest.getParticipantContextId())).hasSize(1)
                     .allSatisfy(dd -> assertThat(dd.getVerificationMethod()).hasSize(1));
         }
+
+
+        @Test
+        void createNewUser_skipStsClientProvisioning(IdentityHub identityHub, EventRouter router) {
+            var subscriber = mock(EventSubscriber.class);
+            router.registerSync(ParticipantContextCreated.class, subscriber);
+
+            var manifest = createNewParticipant().provisionStsAccount(false).build();
+
+            identityHub.getIdentityEndpoint().baseRequest()
+                    .header(authorizeUser(SUPER_USER, identityHub))
+                    .contentType(ContentType.JSON)
+                    .body(manifest)
+                    .post("/v1beta/participants/")
+                    .then()
+                    .log().ifError()
+                    .statusCode(anyOf(equalTo(200), equalTo(204)))
+                    .body("clientId", nullValue())
+                    .body("apiKey", notNullValue())
+                    .body("clientSecret", nullValue());
+
+            verify(subscriber).on(argThat(env -> ((ParticipantContextCreated) env.getPayload()).getParticipantContextId().equals(manifest.getParticipantContextId())));
+
+            assertThat(identityHub.getKeyPairsForParticipant(manifest.getParticipantContextId())).hasSize(1);
+            assertThat(identityHub.getDidForParticipant(manifest.getParticipantContextId())).hasSize(1)
+                    .allSatisfy(dd -> assertThat(dd.getVerificationMethod()).hasSize(1));
+        }
+
 
         @Test
         void createNewUser_whenKeyPairActive(IdentityHub identityHub, EventRouter router) {
@@ -192,7 +221,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
                     .header(authorizeUser(SUPER_USER, identityHub))
                     .contentType(ContentType.JSON)
                     .body(manifest)
-                    .post("/v1alpha/participants/")
+                    .post("/v1beta/participants/")
                     .then()
                     .log().ifError()
                     .statusCode(anyOf(equalTo(200), equalTo(204)))
@@ -229,7 +258,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
                     .header(authorizeUser(SUPER_USER, identityHub))
                     .contentType(ContentType.JSON)
                     .body(manifest)
-                    .post("/v1alpha/participants/")
+                    .post("/v1beta/participants/")
                     .then()
                     .log().ifError()
                     .statusCode(anyOf(equalTo(200), equalTo(204)))
@@ -257,7 +286,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
                     .header(authorizeUser(SUPER_USER, identityHub))
                     .contentType(ContentType.JSON)
                     .body(manifest)
-                    .post("/v1alpha/participants/")
+                    .post("/v1beta/participants/")
                     .then()
                     .log().ifError()
                     .statusCode(anyOf(equalTo(200), equalTo(204)))
@@ -294,7 +323,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
                     .header(auth)
                     .contentType(ContentType.JSON)
                     .body(manifest)
-                    .post("/v1alpha/participants/")
+                    .post("/v1beta/participants/")
                     .then()
                     .log().ifError()
                     .statusCode(403)
@@ -316,7 +345,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
                     .header(authorizeUser(principal, identityHub))
                     .contentType(ContentType.JSON)
                     .body(manifest)
-                    .post("/v1alpha/participants/")
+                    .post("/v1beta/participants/")
                     .then()
                     .log().ifValidationFails()
                     .statusCode(403)
@@ -339,7 +368,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
                     .header(authorizeUser(SUPER_USER, identityHub))
                     .contentType(ContentType.JSON)
                     .body(manifest)
-                    .post("/v1alpha/participants/")
+                    .post("/v1beta/participants/")
                     .then()
                     .log().ifValidationFails()
                     .statusCode(409);
@@ -362,7 +391,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
                     .header(authorizeUser(SUPER_USER, identityHub))
                     .contentType(ContentType.JSON)
                     .body(manifest)
-                    .post("/v1alpha/participants/")
+                    .post("/v1beta/participants/")
                     .then()
                     .log().ifError()
                     .statusCode(anyOf(equalTo(200), equalTo(204)))
@@ -387,7 +416,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
                     .header(authorizeUser(SUPER_USER, identityHub))
                     .contentType(ContentType.JSON)
                     .body(manifest)
-                    .post("/v1alpha/participants/")
+                    .post("/v1beta/participants/")
                     .then()
                     .log().ifError()
                     .statusCode(anyOf(equalTo(200), equalTo(204)))
@@ -413,7 +442,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
 
             identityHub.getIdentityEndpoint().baseRequest()
                     .header(authorizeUser(SUPER_USER, identityHub)).contentType(ContentType.JSON)
-                    .post("/v1alpha/participants/%s/state?isActive=true".formatted(participantId))
+                    .post("/v1beta/participants/%s/state?isActive=true".formatted(participantId))
                     .then()
                     .log().ifError()
                     .statusCode(204);
@@ -443,7 +472,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
             identityHub.getIdentityEndpoint().baseRequest()
                     .header(authorizeUser(SUPER_USER, identityHub))
                     .contentType(ContentType.JSON)
-                    .post("/v1alpha/participants/%s/state?isActive=false".formatted(participantContextId))
+                    .post("/v1beta/participants/%s/state?isActive=false".formatted(participantContextId))
                     .then()
                     .log().ifError()
                     .statusCode(204);
@@ -473,7 +502,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
             identityHub.getIdentityEndpoint().baseRequest()
                     .header(authorizeUser(SUPER_USER, identityHub))
                     .contentType(ContentType.JSON)
-                    .delete("/v1alpha/participants/%s".formatted(participantContextId))
+                    .delete("/v1beta/participants/%s".formatted(participantContextId))
                     .then()
                     .log().ifError()
                     .statusCode(204);
@@ -494,7 +523,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
                     .allSatisfy(t -> identityHub.getIdentityEndpoint().baseRequest()
                             .header(t)
                             .contentType(ContentType.JSON)
-                            .post("/v1alpha/participants/%s/token".formatted(participantContextId))
+                            .post("/v1beta/participants/%s/token".formatted(participantContextId))
                             .then()
                             .log().ifError()
                             .statusCode(200)
@@ -502,7 +531,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
         }
 
         @Test
-        void updateRoles(IdentityHub identityHub) {
+        void updateScopes(IdentityHub identityHub) {
             var participantContextId = "some-user";
             identityHub.createParticipant(participantContextId);
 
@@ -510,17 +539,17 @@ public class IdentityHubParticipantContextApiEndToEndTest {
                     .header(authorizeUser(SUPER_USER, identityHub))
                     .contentType(ContentType.JSON)
                     .body(List.of("role1", "role2", "admin"))
-                    .put("/v1alpha/participants/%s/roles".formatted(participantContextId))
+                    .put("/v1beta/participants/%s/scopes".formatted(participantContextId))
                     .then()
                     .log().ifError()
                     .statusCode(204);
 
-            assertThat(identityHub.getParticipant(participantContextId).getRoles()).containsExactlyInAnyOrder("role1", "role2", "admin");
+            assertThat(identityHub.getParticipant(participantContextId).getScopes()).containsExactlyInAnyOrder("role1", "role2", "admin");
         }
 
         @ParameterizedTest(name = "Expect 403, role = {0}")
-        @ValueSource(strings = { "some-role", "admin" })
-        void updateRoles_whenNotSuperuser(String role, IdentityHub identityHub) {
+        @ValueSource(strings = {"some-role", "admin"})
+        void updateScopes_whenNotSuperuser(String role, IdentityHub identityHub) {
             var participantContextId = "some-user";
             var userAuth = authorizeUser(participantContextId, identityHub);
 
@@ -528,7 +557,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
                     .header(userAuth)
                     .contentType(ContentType.JSON)
                     .body(List.of(role))
-                    .put("/v1alpha/participants/%s/roles".formatted(participantContextId))
+                    .put("/v1beta/participants/%s/scopes".formatted(participantContextId))
                     .then()
                     .log().ifError()
                     .statusCode(403);
@@ -544,7 +573,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
             var found = identityHub.getIdentityEndpoint().baseRequest()
                     .contentType(JSON)
                     .header(authorizeUser(SUPER_USER, identityHub))
-                    .get("/v1alpha/participants")
+                    .get("/v1beta/participants")
                     .then()
                     .log().ifValidationFails()
                     .statusCode(200)
@@ -562,7 +591,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
             var found = identityHub.getIdentityEndpoint().baseRequest()
                     .contentType(JSON)
                     .header(authorizeUser(SUPER_USER, identityHub))
-                    .get("/v1alpha/participants?offset=2&limit=4")
+                    .get("/v1beta/participants?offset=2&limit=4")
                     .then()
                     .log().ifValidationFails()
                     .statusCode(200)
@@ -580,7 +609,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
             var found = identityHub.getIdentityEndpoint().baseRequest()
                     .contentType(JSON)
                     .header(authorizeUser(SUPER_USER, identityHub))
-                    .get("/v1alpha/participants")
+                    .get("/v1beta/participants")
                     .then()
                     .log().ifValidationFails()
                     .statusCode(200)
@@ -600,7 +629,7 @@ public class IdentityHubParticipantContextApiEndToEndTest {
             identityHub.getIdentityEndpoint().baseRequest()
                     .contentType(JSON)
                     .header(attackerAuth)
-                    .get("/v1alpha/participants")
+                    .get("/v1beta/participants")
                     .then()
                     .log().ifValidationFails()
                     .statusCode(403);

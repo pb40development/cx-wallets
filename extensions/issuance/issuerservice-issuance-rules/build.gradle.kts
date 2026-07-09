@@ -22,13 +22,12 @@ dependencies {
     api(project(":spi:issuerservice:issuerservice-issuance-spi"))
     api(libs.edc.spi.core)
 
-    implementation(libs.edc.spi.validator)
     implementation(project(":core:lib:issuerservice-common-lib"))
 
     testImplementation(libs.edc.junit)
-    testImplementation(libs.edc.lib.json)
+    testImplementation(libs.edc.lib.jsonld)
 
-    testFixturesImplementation(libs.edc.spi.identity.did)
+    testFixturesImplementation(libs.edc.spi.core)
     testFixturesImplementation(libs.junit.jupiter.api)
     testFixturesImplementation(libs.edc.junit)
 }

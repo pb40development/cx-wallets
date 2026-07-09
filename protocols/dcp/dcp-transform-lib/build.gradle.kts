@@ -18,11 +18,10 @@ plugins {
 }
 
 dependencies {
-    api(libs.edc.spi.jsonld)
+    api(libs.edc.spi.core)
     api(project(":protocols:dcp:dcp-issuer:dcp-issuer-spi"))
 
     testImplementation(libs.edc.lib.jsonld)
-    testImplementation(libs.edc.lib.transform)
 
 }
 

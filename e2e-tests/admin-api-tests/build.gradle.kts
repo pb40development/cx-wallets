@@ -28,7 +28,7 @@ dependencies {
     testImplementation(libs.awaitility)
     testImplementation(libs.testcontainers.junit)
     testImplementation(libs.testcontainers.postgres)
-    testImplementation(libs.mockserver.netty)
+    testImplementation(libs.wiremock)
 
     // needed for the Participant
     testImplementation(libs.edc.transaction.local)
@@ -37,7 +37,7 @@ dependencies {
     testImplementation(project(":spi:sts-spi"))
     testImplementation(testFixtures(project(":e2e-tests:identityhub-test-fixtures")))
     testImplementation(testFixtures(project(":spi:verifiable-credential-spi")))
-    testImplementation(testFixtures(libs.edc.lib.oauth2.authn))
+    testImplementation(testFixtures(libs.edc.lib.core))
 
 }
 

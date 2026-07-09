@@ -8,8 +8,8 @@ dependencies {
     api(project(":spi:verifiable-credential-spi"))
     implementation(project(":extensions:api:identity-api:identity-api-configuration"))
     implementation(project(":extensions:api:identity-api:validators:verifiable-credential-validators"))
-    implementation(libs.edc.spi.web)
-    implementation(libs.edc.lib.util) // StringUtils
+    implementation(libs.edc.spi.core)
+    implementation(libs.edc.lib.core) // StringUtils
     implementation(libs.jakarta.rsApi)
     implementation(libs.jakarta.annotation)
 

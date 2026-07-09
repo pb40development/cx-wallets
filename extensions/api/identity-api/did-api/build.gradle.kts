@@ -23,9 +23,7 @@ dependencies {
     api(project(":spi:identity-hub-spi"))
     api(project(":spi:did-spi"))
     implementation(project(":extensions:api:identity-api:identity-api-configuration"))
-    implementation(libs.edc.spi.validator)
-    implementation(libs.edc.spi.web)
-    implementation(libs.edc.lib.jerseyproviders)
+    implementation(libs.edc.lib.core)
     implementation(libs.jakarta.rsApi)
     implementation(libs.jakarta.annotation)
 

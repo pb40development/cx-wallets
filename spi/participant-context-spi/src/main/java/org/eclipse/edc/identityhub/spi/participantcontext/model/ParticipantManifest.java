@@ -37,9 +37,10 @@ import static java.util.Optional.ofNullable;
 public class ParticipantManifest {
     private Set<KeyDescriptor> keys = new HashSet<>();
     private Map<String, Object> additionalProperties = new HashMap<>();
-    private List<String> roles = new ArrayList<>();
+    private List<String> scopes = new ArrayList<>();
     private Set<Service> serviceEndpoints = new HashSet<>();
     private boolean isActive;
+    private boolean provisionStsAccount = true;
     private String participantContextId;
     private String did;
     private String apiKeyAlias;
@@ -71,6 +72,14 @@ public class ParticipantManifest {
     }
 
     /**
+     * Indicates whether an STS account should be provisioned for this participant during creation. When {@code false}, the STS account provisioning
+     * phase is skipped entirely. Defaults to {@code true}.
+     */
+    public boolean isProvisionStsAccount() {
+        return provisionStsAccount;
+    }
+
+    /**
      * The ID of the participant context. It is different from the stable DSP - dataspace ID or a DID. This could be a random ID.
      */
     public String getParticipantContextId() {
@@ -92,8 +101,8 @@ public class ParticipantManifest {
         return did;
     }
 
-    public List<String> getRoles() {
-        return roles;
+    public List<String> getScopes() {
+        return scopes;
     }
 
     public Object getProperty(String key) {
@@ -133,6 +142,11 @@ public class ParticipantManifest {
             return this;
         }
 
+        public Builder provisionStsAccount(boolean provisionStsAccount) {
+            manifest.provisionStsAccount = provisionStsAccount;
+            return this;
+        }
+
         public Builder participantContextId(String participantContextId) {
             manifest.participantContextId = participantContextId;
             return this;
@@ -149,8 +163,8 @@ public class ParticipantManifest {
             return this;
         }
 
-        public Builder roles(List<String> roles) {
-            manifest.roles = roles;
+        public Builder scopes(List<String> scopes) {
+            manifest.scopes = scopes;
             return this;
         }
 
