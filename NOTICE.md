@@ -34,6 +34,8 @@ Please refer to the [DEPENDENCIES](https://eclipse-edc.github.io/IdentityHub/DEP
 
 Beyond that, the construct-x wallet repository also includes the super-user-seed-extension as provided [here](https://github.com/FraunhoferISST/super-user-seed-extension) as a submodule. 
 
+The Constuct-X wallet Helm charts are based on [Tractus-X IdentityHub Helm charts](https://github.com/eclipse-tractusx/tractusx-identityhub).
+
 ## Cryptography
 
 Content may contain encryption software. The country in which you are currently may have restrictions on the import,
