@@ -24,7 +24,7 @@ import static org.eclipse.edc.spi.result.Result.failure;
 import static org.eclipse.edc.spi.result.Result.success;
 
 /**
- * A ScopeToCriterionTransformer that accepts simple "<namespace>:<credentialType>" scopes.
+ * A ScopeToCriterionTransformer that accepts simple "<namespace>:<credentialType>:<scope>" scopes.
  */
 public class SimpleScopeTransformer implements ScopeToCriterionTransformer {
 
